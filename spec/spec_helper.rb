@@ -1,5 +1,7 @@
 require "bundler/setup"
 require "sequins"
+require 'timecop'
+require 'rspec/rails/matchers/active_job'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -10,5 +12,13 @@ RSpec.configure do |config|
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
+  end
+
+  config.before do
+    ActiveJob::Base.queue_adapter = :test    
+  end
+
+  config.after do
+    Timecop.return
   end
 end

@@ -21,7 +21,7 @@ Or install it yourself as:
 
 ## Usage
 
-```
+```ruby
 class ExampleSequence < Sequins::Base
   sequence do
     step :start, initial: true do
@@ -40,6 +40,19 @@ end
 # somewhere else in your codebase
 
 ExampleSequence.trigger(current_user)
+```
+
+## Configuration
+
+```ruby
+# in config/initializers/sequins.rb
+
+Sequins.configure do |config|
+  # Specify the default time zone in tz format.
+  # If you are using Sequins inside Rails this will be set to Rails.configuration.time_zone.
+  # You can also change this per-target by providing a `local_time_zone` method on your target.
+  config.default_time_zone = 'America/Chicago'
+end
 ```
 
 ## Development

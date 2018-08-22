@@ -66,7 +66,13 @@ module Sequins
     end    
 
     def delay(duration, target, options)
-      delay_until = Time.now + duration
+      if target.respond_to?(:local_time_zone)
+        zone = ActiveSupport::TimeZone[target.local_time_zone]
+      else
+        zone = ActiveSupport::TimeZone[Sequins.configuration.default_time_zone]
+      end
+
+      delay_until = zone.now + duration
 
       if options[:only] == :weekdays
         current_wday = delay_until.wday
@@ -80,7 +86,7 @@ module Sequins
 
       if !options[:at].nil?
         tod = Tod::TimeOfDay.parse(options[:at])
-        delay_until = delay_until.to_date.at(tod)
+        delay_until = delay_until.to_date.at(tod, zone)
       end
 
       next_step = options[:then]

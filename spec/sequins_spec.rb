@@ -1,6 +1,7 @@
 RSpec.describe Sequins do
-
   Target = Struct.new(:last_run_step, :did_start, :did_end, :sent_message, :id)
+
+  include RSpec::Rails::Matchers
 
   class TestSequence < Sequins::Base
     sequence do
@@ -24,6 +25,22 @@ RSpec.describe Sequins do
         target.last_run_step = :second_step
         end_sequence
       end
+
+      step :basic_delay_step do
+        delay 1.day, then: :delay_finish
+      end
+
+      step :only_weekdays_delay_step do
+        delay 1.day, only: :weekdays, then: :delay_finish
+      end
+
+      step :specific_time_delay_step do
+        delay 1.day, at: '11am', then: :delay_finish
+      end
+
+      step :delay_finish do
+        # noop
+      end
     end
 
     def self.send_message(target, message)
@@ -44,7 +61,7 @@ RSpec.describe Sequins do
     end
 
     it "should be able to call methods on the sequence" do
-      TestSequence.new.run_step_for_target(:first_step, subject)      
+      TestSequence.new.run_step_for_target(:first_step, subject)
       expect(subject.sent_message).to eq :first_step_message
     end
   end
@@ -60,6 +77,33 @@ RSpec.describe Sequins do
     it "should run after end_sequence" do
       TestSequence.new.run_step_for_target(:second_step, subject)
       expect(subject.did_end).to be_truthy
+    end
+  end
+
+  describe "delay" do
+    it 'should run the next step after the given delay' do
+      Timecop.freeze
+
+      expect {
+        TestSequence.new.run_step_for_target(:basic_delay_step, subject)
+      }.to have_enqueued_job(Sequins::DelayWorker).at(Time.now + 1.day)
+    end
+
+    it 'should account for weekdays' do
+      Timecop.freeze('2018-07-28 10:00:00')
+
+      expect {
+        TestSequence.new.run_step_for_target(:only_weekdays_delay_step, subject)
+      }.to have_enqueued_job(Sequins::DelayWorker).at(Time.now + 2.days)
+    end
+
+    it 'should account for an at param' do
+      zone = ActiveSupport::TimeZone['America/Chicago']
+      Timecop.freeze(zone.parse('2018-07-28 10:00:00'))
+
+      expect {
+        TestSequence.new.run_step_for_target(:specific_time_delay_step, subject)
+      }.to have_enqueued_job(Sequins::DelayWorker).at(zone.parse('2018-07-29 11:00:00'))
     end
   end
 

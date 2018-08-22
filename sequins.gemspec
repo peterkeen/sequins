@@ -33,9 +33,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency "docile"
   spec.add_dependency "tod"
   spec.add_dependency "autoloaded", "~> 2"
-  spec.add_dependency "rails", ">= 5.1"
+  spec.add_dependency "rails", ">= 5.0"
 
   spec.add_development_dependency "bundler", "~> 1.16"
   spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "rspec", "~> 3.0"
+  spec.add_development_dependency "rspec", "~> 3.5"
+  spec.add_development_dependency "rspec-rails", "~> 3.5"
+  spec.add_development_dependency "timecop"
 end

@@ -3,6 +3,7 @@ module Sequins
     def self.sequence(&block)
       if block_given?
         @_sequence = Docile.dsl_eval(SequenceBuilder.new(self), &block).build
+        after_sequence_build(@_sequence) if respond_to?(:after_sequence_build)
       else
         @_sequence
       end
