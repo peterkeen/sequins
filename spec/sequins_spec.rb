@@ -1,10 +1,9 @@
 RSpec.describe Sequins do
 
-  Target = Struct.new(:last_run_step, :did_start, :did_end, :id)
+  Target = Struct.new(:last_run_step, :did_start, :did_end, :sent_message, :id)
 
   class TestSequence < Sequins::Base
     sequence do
-
       before_sequence do
         target.did_start = true
       end
@@ -15,6 +14,9 @@ RSpec.describe Sequins do
 
       step :first_step, initial: true do
         target.last_run_step = :first_step
+
+        send_message target, :first_step_message
+
         delay 3 * 24 * 60 * 60, then: :second_step
       end
 
@@ -22,6 +24,10 @@ RSpec.describe Sequins do
         target.last_run_step = :second_step
         end_sequence
       end
+    end
+
+    def self.send_message(target, message)
+      target.sent_message = message
     end
   end
 
@@ -35,6 +41,11 @@ RSpec.describe Sequins do
     it "should run the step" do
       TestSequence.new.run_step_for_target(:first_step, subject)
       expect(subject.last_run_step).to eq :first_step
+    end
+
+    it "should be able to call methods on the sequence" do
+      TestSequence.new.run_step_for_target(:first_step, subject)      
+      expect(subject.sent_message).to eq :first_step_message
     end
   end
 
