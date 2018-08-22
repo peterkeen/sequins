@@ -1,5 +1,8 @@
-require "sequins/version"
+require 'docile'
+require 'tod'
+require 'active_job'
+require 'autoloaded'
 
 module Sequins
-  # Your code goes here...
+  Autoloaded.module { }
 end
