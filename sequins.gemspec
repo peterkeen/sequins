@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = %q{Sequins allows you to define temporal sequences of actions}
   spec.description   = %q{Set up sequences of actions that are delayed in time}
-  spec.homepage      = "https://opensource.egghead.io/sequins"
+  spec.homepage      = "https://github.com/eggheadio/sequins"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
