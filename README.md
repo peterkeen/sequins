@@ -48,7 +48,7 @@ The first argument to `delay` is always an interval, usually expressed as a numb
 In addition, it can take these arguments:
 
 * `then` (always required) this tells delay which step to run next
-* `at` specifies a time relative to the user's local timezone to run the next step
+* `at` specifies a time relative to the target's local timezone to run the next step
 * `only` limits what days to send on. Currently the only valid option is `:weekdays`
 
 ### Trigger a Sequence
@@ -70,7 +70,7 @@ before_sequence  # runs before the sequence starts.
 after_sequence   # runs after the sequence ends with an explicit `end_sequence`
 ```
 
-Hooks are run in the same way steps are, so you have access to the `user` object if you want it.
+Hooks are run in the same way steps are, so you have access to the `target` object if you want it.
 
 ## Configuration
 
