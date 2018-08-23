@@ -1,6 +1,6 @@
 # Sequins
 
-Sequences allows you to define temporal sequences of actions.
+Sequins allows you to define temporal sequences of actions.
 A sequence is one or more steps that run in any order you choose with any delay between them you choose.
 
 ## Installation
