@@ -11,15 +11,19 @@ module Sequins
     end
 
     def before_each_step(&block)
-      @seq.add_before_each_step_hook(&block)
+      @seq.add_hook(:before_each_step, &block)
+    end
+
+    def after_each_step(&block)
+      @seq.add_hook(:after_each_step, &block)
     end
 
     def before_sequence(&block)
-      @seq.add_before_sequence_hook(&block)
+      @seq.add_hook(:before_sequence, &block)
     end
 
     def after_sequence(&block)
-      @seq.add_after_sequence_hook(&block)
+      @seq.add_hook(:after_sequence, &block)
     end
 
     def build

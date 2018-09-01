@@ -1,7 +1,15 @@
 RSpec.describe Sequins do
-  Target = Struct.new(:last_run_step, :did_start, :did_end, :sent_message, :id)
+  Target = Struct.new(:last_run_step, :did_start, :did_end, :did_after, :sent_message, :id)
 
   include RSpec::Rails::Matchers
+
+  class InvalidSequence < Sequins::Base
+    sequence do
+      step :whatever do
+        #noop
+      end
+    end
+  end
 
   class TestSequence < Sequins::Base
     sequence do
@@ -15,6 +23,10 @@ RSpec.describe Sequins do
 
       before_each_step do
         target.last_run_step = step_name
+      end
+
+      after_each_step do
+        target.did_after = true
       end
 
       step :first_step, initial: true do
@@ -65,12 +77,31 @@ RSpec.describe Sequins do
       TestSequence.new.run_step_for_target(:first_step, subject)
       expect(subject.sent_message).to eq :first_step_message
     end
+
+    it "should call the after hooks" do
+      TestSequence.new.run_step_for_target(:first_step, subject)      
+      expect(subject.did_after).to be_truthy
+    end
+
+    it "should raise an error for an invalid step" do
+      expect {
+        TestSequence.new.run_step_for_target(:invalid_step, subject)
+      }.to raise_error(InvalidStepError)
+    end
   end
 
   describe "before_sequence hook" do
     it "should run" do
       TestSequence.trigger(subject)
       expect(subject.did_start).to eq :_before_sequence
+    end
+  end
+
+  describe "no initial step" do
+    it "should error" do
+      expect {
+        InvalidSeqeuence.trigger(subject)
+      }.to raise_error(NoInitialStepError)
     end
   end
 

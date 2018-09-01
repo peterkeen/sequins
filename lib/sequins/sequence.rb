@@ -7,60 +7,45 @@ module Sequins
     def initialize(klass)
       @klass = klass
       @steps = {}
-      @before_each_step_hooks = []
-      @before_sequence_hooks = []
-      @after_sequence_hooks = []
+      @hooks = {}
     end
 
     def add_step(name, options={}, &block)
       @steps[name] = StepProxy.new(options, block)
     end
 
-    def add_before_each_step_hook(&block)
-      @before_each_step_hooks << StepProxy.new({}, block)
-    end
-
-    def add_before_sequence_hook(&block)
-      @before_sequence_hooks << StepProxy.new({}, block)
-    end    
-
-    def add_after_sequence_hook(&block)
-      @after_sequence_hooks << StepProxy.new({}, block)      
+    def add_hook(stage, &block)
+      @hooks[stage] ||= []
+      @hooks[stage] << StepProxy.new({}, block)
     end
 
     def run_step_for_target(step_name, target, *args)
       proxy = @steps[step_name]
       raise UnknownStepError.new(step_name) if proxy.nil?
 
-      unless run_before_each_step_hooks_for_target(target, step_name)
-        run_after_sequence_hooks_for_target(target, step_name)
+      unless run_hooks_for_target(:before_each_step, target, step_name)
+        run_hooks_for_target(:after_sequence, target, :_after_sequence)
         return false
       end
 
       step = Docile.dsl_eval(Step.new(target, self, step_name), &(proxy.block))
-      if step.sequence_ended?
-        run_after_sequence_hooks_for_target(target)
+
+      unless 
+        run_hooks_for_target(:after_sequence, target, :_after_sequence)
+        return false
+      end
+
+      if !run_hooks_for_target(:after_each_step, target, step_name) && step.sequence_ended?
+        run_hooks_for_target(:after_sequence, target, :_after_sequence)
         return false
       end
     end
 
-    def run_before_each_step_hooks_for_target(target, step_name)
-      @before_each_step_hooks.each do |hook|
+    def run_hooks_for_target(stage, target, step_name)
+      return if @hooks[stage].nil? || @hooks[stage].empty?
+
+      @hooks[stage].each do |hook|
         step = Docile.dsl_eval(Step.new(target, self, step_name), &(hook.block))
-        return false if step.sequence_ended?
-      end
-    end
-
-    def run_before_sequence_hooks_for_target(target)
-      @before_sequence_hooks.each do |hook|
-        step = Docile.dsl_eval(Step.new(target, self, :_before_sequence), &(hook.block))
-        return false if step.sequence_ended?
-      end        
-    end
-
-    def run_after_sequence_hooks_for_target(target)
-      @after_sequence_hooks.each do |hook|
-        step = Docile.dsl_eval(Step.new(target, self, :_after_sequence), &(hook.block))
         return false if step.sequence_ended?
       end        
     end    
@@ -95,12 +80,14 @@ module Sequins
     end
 
     def trigger(target, *args)
-      unless run_before_sequence_hooks_for_target(target)
-        run_after_sequence_hooks_for_target(target)
+      step_name, _ = @steps.detect { |_, s| s.options[:initial] }
+      raise NoInitialStepError.new unless step_name.present?
+
+      unless run_hooks_for_target(:before_sequence, target, :_before_sequence)
+        run_hooks_for_target(:after_sequence, target, :_after_sequence)
         return false
       end
 
-      step_name, _ = @steps.detect { |_, s| s.options[:initial] }
       run_step_for_target(step_name, target, *args)
     end
 
