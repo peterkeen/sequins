@@ -1,10 +1,11 @@
 module Sequins
   class Step
-    attr_reader :target
+    attr_reader :target, :step_name
 
-    def initialize(target, sequence)
+    def initialize(target, sequence, step_name)
       @target = target
       @sequence = sequence
+      @step_name = step_name
     end
 
     def end_sequence

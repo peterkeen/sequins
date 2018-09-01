@@ -6,23 +6,24 @@ RSpec.describe Sequins do
   class TestSequence < Sequins::Base
     sequence do
       before_sequence do
-        target.did_start = true
+        target.did_start = step_name
       end
 
       after_sequence do
-        target.did_end = true
+        target.did_end = step_name
+      end
+
+      before_each_step do
+        target.last_run_step = step_name
       end
 
       step :first_step, initial: true do
-        target.last_run_step = :first_step
-
         send_message target, :first_step_message
 
         delay 3 * 24 * 60 * 60, then: :second_step
       end
 
       step :second_step do
-        target.last_run_step = :second_step
         end_sequence
       end
 
@@ -69,14 +70,14 @@ RSpec.describe Sequins do
   describe "before_sequence hook" do
     it "should run" do
       TestSequence.trigger(subject)
-      expect(subject.did_start).to be_truthy
+      expect(subject.did_start).to eq :_before_sequence
     end
   end
 
   describe "after_sequence hook" do
     it "should run after end_sequence" do
       TestSequence.new.run_step_for_target(:second_step, subject)
-      expect(subject.did_end).to be_truthy
+      expect(subject.did_end).to eq :_after_sequence
     end
   end
 
