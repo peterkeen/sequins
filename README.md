@@ -42,6 +42,52 @@ class ExampleSequence < Sequins::Base
 end
 ```
 
+### Steps
+
+A step is a Ruby block. It has the following attributes available:
+
+* `target` is the target object that you pass into `trigger` or `run_step_for_target`
+* `step_name` is the step that's currently running
+* `sequence` is an instance of `Sequins::Sequence`. From this you have access to the sequence class via `sequence.klass`
+
+You also have direct access to class methods on your `Sequence::Base` subclass. For example:
+
+```ruby
+class Example2Sequence < Sequins::Base
+  sequence do
+    step :start, initial: true do
+      send_message target, "hi there"
+    end
+  end
+
+  def self.send_message(target, text)
+    SomeMailer.send_message(target.id, text).deliver_later
+  end
+end
+```
+
+You can also send arguments to `trigger` or `run_step_for_target` which will be passed as block arguments. Example:
+
+```ruby
+class Example3Sequence < Sequins::Base
+  sequence do
+    step :start, initial: true do |something|
+      if something.present?
+        delay 3.days, then: :next_step
+      else
+        end_sequence
+      end
+    end
+
+    step :next_step do
+      # something interesting
+    end
+  end
+end
+
+Example3Sequence.trigger(User.first, "this will trigger a delay")
+```
+
 ### Delay Options
 
 The first argument to `delay` is always an interval, usually expressed as a number of days. Ex: `3.days`.
@@ -66,11 +112,12 @@ Sequences can define hooks. The available hooks are:
 
 ```
 before_each_step # runs before every step.
+after_each_step  # runs after each step
 before_sequence  # runs before the sequence starts. 
 after_sequence   # runs after the sequence ends with an explicit `end_sequence`
 ```
 
-Hooks are run in the same way steps are, so you have access to the `target` object if you want it.
+Hooks are run in the same way steps are, so you have access to all of the same attributes as a step. Within `before_each_step` and `after_each_step`, `step_name` will be set to the step that is about to or just finished running. Within `before_sequence` and `after_sequence` `step_name` has no meaning.
 
 ## Configuration
 
