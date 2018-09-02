@@ -86,7 +86,7 @@ RSpec.describe Sequins do
     it "should raise an error for an invalid step" do
       expect {
         TestSequence.new.run_step_for_target(:invalid_step, subject)
-      }.to raise_error(InvalidStepError)
+      }.to raise_error(Sequins::UnknownStepError)
     end
   end
 
@@ -100,8 +100,8 @@ RSpec.describe Sequins do
   describe "no initial step" do
     it "should error" do
       expect {
-        InvalidSeqeuence.trigger(subject)
-      }.to raise_error(NoInitialStepError)
+        InvalidSequence.trigger(subject)
+      }.to raise_error(Sequins::NoInitialStepError)
     end
   end
 

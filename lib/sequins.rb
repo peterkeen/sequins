@@ -8,9 +8,6 @@ require 'autoloaded'
 module Sequins
   Autoloaded.module { }
 
-  autoload :InvalidStepError, 'sequins/errors'
-  autoload :NoInitialStepError, 'sequins/errors'
-
   class << self
     attr_writer :configuration
   end
@@ -28,3 +25,4 @@ module Sequins
   end
 end
 
+require 'sequins/errors'
