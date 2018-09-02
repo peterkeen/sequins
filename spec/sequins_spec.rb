@@ -51,6 +51,10 @@ RSpec.describe Sequins do
         delay 1.day, at: '11am', then: :delay_finish
       end
 
+      step :step_with_args do |a, b|
+        send_message target, "#{a} #{b}"
+      end
+
       step :delay_finish do
         # noop
       end
@@ -88,6 +92,15 @@ RSpec.describe Sequins do
         TestSequence.new.run_step_for_target(:invalid_step, subject)
       }.to raise_error(Sequins::UnknownStepError)
     end
+
+    it "should pass args along to step block" do
+      TestSequence.new.run_step_for_target(:step_with_args, subject, 'a', 'b')
+      expect(subject.sent_message).to eq 'a b'      
+    end
+
+    it "should not error if args passed to step block that does not expect them" do
+      TestSequence.new.run_step_for_target(:first_step, subject, 'a', 'b')
+    end    
   end
 
   describe "before_sequence hook" do

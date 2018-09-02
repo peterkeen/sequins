@@ -28,14 +28,11 @@ module Sequins
         return false
       end
 
-      step = Docile.dsl_eval(Step.new(target, self, step_name), &(proxy.block))
+      step = Docile.dsl_eval(Step.new(target, self, step_name), args, &(proxy.block))
 
-      unless 
-        run_hooks_for_target(:after_sequence, target, :_after_sequence)
-        return false
-      end
+      ended_after_each = !run_hooks_for_target(:after_each_step, target, step_name)      
 
-      if !run_hooks_for_target(:after_each_step, target, step_name) && step.sequence_ended?
+      if step.sequence_ended? || ended_after_each
         run_hooks_for_target(:after_sequence, target, :_after_sequence)
         return false
       end

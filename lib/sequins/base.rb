@@ -13,16 +13,16 @@ module Sequins
       self.to_s.underscore.gsub(/_sequence$/, '')
     end
   
-    def self.trigger(target)
-      sequence.trigger(target)
+    def self.trigger(target, *args)
+      sequence.trigger(target, *args)
     end
   
-    def trigger(target)
-      self.class.trigger(target)
+    def trigger(target, *args)
+      self.class.trigger(target, *args)
     end
   
-    def run_step_for_target(step_name, target)
-      self.class.sequence.run_step_for_target(step_name, target)
+    def run_step_for_target(step_name, target, *args)
+      self.class.sequence.run_step_for_target(step_name, target, *args)
     end    
   end
 end
