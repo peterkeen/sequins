@@ -19,6 +19,11 @@ module Sequins
       @hooks[stage] << StepProxy.new({}, block)
     end
 
+    def prepend_hook(stage, &block)
+      @hooks[stage] ||= []
+      @hooks[stage].unshift StepProxy.new({}, block)
+    end
+
     def run_step_for_target(step_name, target, *args)
       proxy = @steps[step_name]
       raise UnknownStepError.new(step_name) if proxy.nil?
