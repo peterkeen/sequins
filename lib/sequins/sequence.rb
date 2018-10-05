@@ -82,7 +82,17 @@ module Sequins
     end
 
     def trigger(target, *args)
-      step_name, _ = @steps.detect { |_, s| s.options[:initial] }
+      options = {}
+      if args.last.is_a?(Hash)
+        options = args.pop
+      end
+
+      if options[:override_initial_step].present?
+        step_name = options[:override_initial_step]
+      else
+        step_name, _ = @steps.detect { |_, s| s.options[:initial] }
+      end
+
       raise NoInitialStepError.new unless step_name.present?
 
       unless run_hooks_for_target(:before_sequence, target, :_before_sequence)

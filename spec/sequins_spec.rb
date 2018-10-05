@@ -125,6 +125,18 @@ RSpec.describe Sequins do
     end
   end
 
+  describe "trigger" do
+    it "should run the initial step" do
+      TestSequence.trigger(subject)
+      expect(subject.last_run_step).to eq :first_step
+    end
+
+    it "should allow an override initial step" do
+      TestSequence.trigger(subject, override_initial_step: :second_step)
+      expect(subject.last_run_step).to eq :second_step
+    end
+  end
+
   describe "delay" do
     it 'should run the next step after the given delay' do
       Timecop.freeze
