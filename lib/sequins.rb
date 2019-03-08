@@ -23,6 +23,10 @@ module Sequins
   def self.configure
     yield configuration
   end
+
+  def self.schedule_delay(delay_until, sequence_class, target, next_step)
+    configuration.delay_scheduler.call(delay_until, sequence_class, target, next_step)
+  end
 end
 
 require 'sequins/errors'

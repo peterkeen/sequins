@@ -78,7 +78,7 @@ module Sequins
 
       next_step = options[:then]
 
-      Sequins::DelayWorker.set(wait_until: delay_until).perform_later(@klass.to_s, target.class.to_s, target.id, next_step.to_s)
+      Sequins.schedule_delay(delay_until, @klass, target, next_step)
     end
 
     def trigger(target, *args)
