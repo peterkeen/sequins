@@ -144,7 +144,7 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/egghea
 
 ## License
 
-Copyright (c) egghead.io LLC. The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+Copyright (c) Peter Keen. The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
 
 ## Code of Conduct
 

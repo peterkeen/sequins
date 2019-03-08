@@ -7,11 +7,11 @@ Gem::Specification.new do |spec|
   spec.name          = "sequins"
   spec.version       = Sequins::VERSION
   spec.authors       = ["Pete Keen"]
-  spec.email         = ["pete@egghead.io"]
+  spec.email         = ["pete@petekeen.net"]
 
   spec.summary       = %q{Sequins allows you to define temporal sequences of actions}
   spec.description   = %q{Set up sequences of actions that are delayed in time}
-  spec.homepage      = "https://github.com/eggheadio/sequins"
+  spec.homepage      = "https://github.com/peterkeen/sequins"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
